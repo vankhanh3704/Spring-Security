@@ -5,20 +5,26 @@ import com.devteria.identify_service.Exception.AppException;
 import com.devteria.identify_service.Exception.ErrorCode;
 import com.devteria.identify_service.Repository.UserRepository;
 import com.devteria.identify_service.dto.request.AuthenticationRequest;
+import com.devteria.identify_service.dto.request.IntrospectRequest;
 import com.devteria.identify_service.dto.response.AuthenticationResponse;
+import com.devteria.identify_service.dto.response.IntrospectResponse;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -32,8 +38,26 @@ public class AuthenticationService {
     UserRepository userRepository;
 
     @NonFinal //đánh dấu để nó không inject vào constructor
-    protected static final String SIGNER_KEY =
-            "MAOAaDeZDPe7abJfyyYmg6G4TQXTdQHNrGRFTdOr1whp6zdheS/COfx2GlDSMbXH";
+    @Value("${jwt.signerKey}") // đọc 1 biến từ file yaml
+    protected String SIGNER_KEY;
+
+    public IntrospectResponse introspectResponse(IntrospectRequest request) throws JOSEException, ParseException {
+        var token = request.getToken();
+        // để verify token này thì
+        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+
+        SignedJWT signedJWT = SignedJWT.parse(token);
+
+        // kiểm tra token hết hạn hay chưa
+        Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        var verified = signedJWT.verify(verifier); // trả về true false
+
+        return IntrospectResponse.builder()
+                .valid(verified && expirationTime.after(new Date()))
+                .build();
+    }
+
 
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {
         var user = userRepository.findByUsername(authenticationRequest.getUsername())
@@ -83,4 +107,6 @@ public class AuthenticationService {
             throw new RuntimeException(e);
         }
     }
+
+
 }

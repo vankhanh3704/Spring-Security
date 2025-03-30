@@ -16,3 +16,6 @@ spring:
 #      ddl-auto: create
 #      ddl-auto: create-drop
     show-sql: true
+
+jwt:
+  signerKey: "MAOAaDeZDPe7abJfyyYmg6G4TQXTdQHNrGRFTdOr1whp6zdheS/COfx2GlDSMbXH"
