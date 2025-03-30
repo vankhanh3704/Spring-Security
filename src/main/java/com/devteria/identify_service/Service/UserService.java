@@ -11,14 +11,17 @@ import com.devteria.identify_service.mapper.UserMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor // nó sẽ tự động đưa vào constructor các cái field có final kết hợp với bên dưới, dùng cái này không cần phải autowired
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true) // bất cứ field nào khai báo bên trong nó tự make private, final
+// nó sẽ tự động đưa vào constructor các cái field có final kết hợp với bên dưới, dùng cái này không cần phải autowired
+@RequiredArgsConstructor
+// bất cứ field nào khai báo bên trong nó tự make private, final
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
@@ -31,6 +34,9 @@ public class UserService {
             throw new AppException(ErrorCode.USER_EXISTED);
         }
         UserEntity user = userMapper.toUser(request);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
         return userRepository.save(user);
     }
 
