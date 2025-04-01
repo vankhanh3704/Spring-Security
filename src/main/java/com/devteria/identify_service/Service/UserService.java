@@ -13,14 +13,17 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 // nó sẽ tự động đưa vào constructor các cái field có final kết hợp với bên dưới, dùng cái này không cần phải autowired
@@ -70,5 +73,13 @@ public class UserService {
 
     public void deleteUser(String id) {
         userRepository.deleteById(id);
+    }
+
+    public UserResponse getMyInfo(){
+        // khi 1 request đc xác thực thành công thì thông tin đăng nhập đc lưu trữ trong SecurityContextHolder
+        var contest = SecurityContextHolder.getContext(); // get user hien tai
+        String name = contest.getAuthentication().getName();
+         UserEntity user = userRepository.findByUsername(name).orElseThrow( () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+         return userMapper.toUserResponse(user);
     }
 }
