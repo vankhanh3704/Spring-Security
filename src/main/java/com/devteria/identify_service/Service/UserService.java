@@ -54,7 +54,7 @@ public class UserService {
         log.info("In method get Users");
         return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
     }
-    @PostAuthorize("hasRole('ADMIN')") // kiểm tra sau khi vào được method rồi mới xét đến role rồi mới trả về
+    @PostAuthorize("returnObject.username == authentication.name") // kiểm tra sau khi vào được method rồi mới xét đến role rồi mới trả về
     public UserResponse getUser(String id) {
         log.info("In method get User by Id");
         return userMapper.toUserResponse(userRepository.findById(id)
