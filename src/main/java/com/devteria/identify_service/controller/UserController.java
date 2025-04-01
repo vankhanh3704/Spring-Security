@@ -11,6 +11,8 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,33 +21,42 @@ import java.util.List;
 @RequestMapping("/users")
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Slf4j
 public class UserController {
     UserService userService;
 
     @PostMapping
-    private ApiResponse<UserEntity> createUser(@RequestBody @Valid UserCreationRequest request) {
+    ApiResponse<UserEntity> createUser(@RequestBody @Valid UserCreationRequest request) {
         ApiResponse<UserEntity> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.createUser(request));
         return apiResponse;
     }
 
     @GetMapping
-    private List<UserEntity> getUsers() {
-        return userService.getUsers();
+    ApiResponse< List<UserResponse> > getUsers() {
+        //trong spring để get thông tin hiện  đang đăng nhập (authenticate trong 1 resquest)
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        log.info("Username : {}", authentication.getName());
+        authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
+
+        return ApiResponse.<List<UserResponse>>builder()
+                .result(userService.getUsers())
+                .build();
     }
 
     @GetMapping("/{userId}")
-    private UserResponse getUser(@PathVariable String userId){
+    UserResponse getUser(@PathVariable String userId) {
         return userService.getUser(userId);
     }
 
     @PutMapping("/{userId}")
-    private UserResponse updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
+    UserResponse updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
         return userService.updateUser(userId, request);
     }
 
     @DeleteMapping("/{userId}")
-    private String deleteUser(@PathVariable String userId){
+    String deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
         return "User deleted";
     }
