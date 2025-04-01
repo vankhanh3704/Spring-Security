@@ -41,7 +41,9 @@ public class SecurityConfig {
                 oauth2 -> oauth2.jwt(jwtConfigurer ->
                         jwtConfigurer.decoder(jwtDecoder())
                                 .jwtAuthenticationConverter(jwtConverter())) // custom
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()) // khi authentication nó fail ta sẽ điều hướng nó
         );
+
 
         httpSecurity.csrf(AbstractHttpConfigurer::disable); // tắt csrf
         return httpSecurity.build();
