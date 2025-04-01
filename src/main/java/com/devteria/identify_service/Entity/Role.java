@@ -1,12 +1,14 @@
 package com.devteria.identify_service.Entity;
 
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDate;
 import java.util.Set;
+
 
 @Entity
 @Data
@@ -14,18 +16,12 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder // giúp tạo ra 1 builder class cho 1 dto
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserEntity {
+public class Role {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
-    String username;
-    String password;
-    String firstName;
-    String lastName;
-    LocalDate dateOfBirth;
+    String name;
+    String description;
 
     @ManyToMany
-    Set<Role> roles;
-
+    Set<Permission> permissions;
 }
