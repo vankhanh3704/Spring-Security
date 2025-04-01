@@ -1,6 +1,7 @@
 package com.devteria.identify_service.Service;
 
 
+import com.devteria.identify_service.Entity.UserEntity;
 import com.devteria.identify_service.Exception.AppException;
 import com.devteria.identify_service.Exception.ErrorCode;
 import com.devteria.identify_service.Repository.UserRepository;
@@ -23,11 +24,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Service
 @RequiredArgsConstructor
@@ -69,7 +73,7 @@ public class AuthenticationService {
         }
 
 
-        var token = generateToken(authenticationRequest.getUsername());
+        var token = generateToken(user);
         return AuthenticationResponse.builder()
                 .token(token)
                 .authenticated(true)
@@ -77,7 +81,7 @@ public class AuthenticationService {
     }
 
     // token trả về là 1 string
-    private String generateToken(String username) {
+    private String generateToken(UserEntity user) {
         // tạo 1 token bằng thư viện numbus, yêu cầu 2 params : header, và payload
 
         // header
@@ -85,12 +89,12 @@ public class AuthenticationService {
 
         // payload : cần 1 cái claim : ~ 1 cai body
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(username) // đại diện cho user đăng nhập
+                .subject(user.getUsername()) // đại diện cho user đăng nhập
                 .issuer("devteria.com") // xác định cái token này được issue từ ai: thường là domain từ service
                 .issueTime(new Date()) // lấy thời điểm hiện tại
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli())) // xác định thời hạn của nó
-                .claim("customClaim", "Custom")
+                .claim("scope", buildScope(user))
                 .build();
 
         // convert
@@ -108,5 +112,11 @@ public class AuthenticationService {
         }
     }
 
-
+    private String buildScope(UserEntity user) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        if(!CollectionUtils.isEmpty(user.getRoles())){
+            user.getRoles().forEach(stringJoiner::add);
+        }
+        return stringJoiner.toString();
+    }
 }
