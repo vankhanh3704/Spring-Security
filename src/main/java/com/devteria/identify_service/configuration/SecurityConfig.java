@@ -1,5 +1,6 @@
 package com.devteria.identify_service.configuration;
 
+import com.devteria.identify_service.Enum.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,7 +34,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/users").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/users").hasRole(Role.ADMIN.name())
                         .anyRequest().authenticated()); // cho phép truy cập mà không cần security, còn tất cả những request khác phải được authenticated ms request đc vào hệ thống
         httpSecurity.oauth2ResourceServer(
                 oauth2 -> oauth2.jwt(jwtConfigurer ->
