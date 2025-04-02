@@ -4,6 +4,7 @@ import com.devteria.identify_service.Entity.UserEntity;
 import com.devteria.identify_service.Enum.Role;
 import com.devteria.identify_service.Exception.AppException;
 import com.devteria.identify_service.Exception.ErrorCode;
+import com.devteria.identify_service.Repository.RoleRepository;
 import com.devteria.identify_service.Repository.UserRepository;
 import com.devteria.identify_service.dto.request.UserCreationRequest;
 import com.devteria.identify_service.dto.request.UserUpdateRequest;
@@ -33,6 +34,7 @@ import java.util.Optional;
 @Slf4j
 public class UserService {
     UserRepository userRepository;
+    RoleRepository roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
 
@@ -52,7 +54,8 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    @PreAuthorize("hasRole('ADMIN')") // kiểm tra trước khi vào được method
+//    @PreAuthorize("hasRole('ADMIN')") // kiểm tra trước khi vào được method
+    @PreAuthorize("hasAuthority('APPROVE_POST')")
     public List<UserResponse> getUsers() {
         log.info("In method get Users");
         return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
@@ -68,6 +71,9 @@ public class UserService {
         UserEntity user = userRepository.findById(userid)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         userMapper.updateUser(user, request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        var roles = roleRepository.findAllById(request.getRoles());
+        user.setRoles(new HashSet<>(roles));
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
