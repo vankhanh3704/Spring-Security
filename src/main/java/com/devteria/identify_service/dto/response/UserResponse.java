@@ -1,5 +1,6 @@
 package com.devteria.identify_service.dto.response;
 
+import com.devteria.identify_service.Entity.Role;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,5 +19,5 @@ public class UserResponse {
      String firstName;
      String lastName;
      LocalDate dateOfBirth;
-     Set<String> roles;
+     Set<Role> roles;
 }
