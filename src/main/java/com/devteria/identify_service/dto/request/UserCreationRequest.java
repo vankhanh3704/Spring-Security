@@ -1,5 +1,6 @@
 package com.devteria.identify_service.dto.request;
 
+import com.devteria.identify_service.validator.DobConstaints;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -20,7 +21,8 @@ public class UserCreationRequest {
     String password;
     String firstName;
     String lastName;
-    LocalDate dateOfBirth;
 
+    @DobConstaints(min = 2, message = "INVALID_DOB")
+    LocalDate dateOfBirth;
 
 }

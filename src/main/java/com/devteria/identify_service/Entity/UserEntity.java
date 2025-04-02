@@ -14,6 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder // giúp tạo ra 1 builder class cho 1 dto
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Table(name = "user")
 public class UserEntity {
 
     @Id
