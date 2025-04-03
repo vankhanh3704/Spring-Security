@@ -1,6 +1,7 @@
 package com.devteria.identify_service.configuration;
 
 import com.devteria.identify_service.Enum.Role;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,10 +28,11 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINTS = {"/users", "/auth/token", "/auth/introspect"};
+    private final String[] PUBLIC_ENDPOINTS = {"/users", "/auth/token", "/auth/introspect", "/auth/logout"};
 
-    @Value("${jwt.signerKey}")
-    private String signerKey;
+    @Autowired
+    private CustomJwtDecoder customJwtDecoder;
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -39,7 +41,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()); // cho phép truy cập mà không cần security, còn tất cả những request khác phải được authenticated ms request đc vào hệ thống
         httpSecurity.oauth2ResourceServer(
                 oauth2 -> oauth2.jwt(jwtConfigurer ->
-                        jwtConfigurer.decoder(jwtDecoder())
+                        jwtConfigurer.decoder(customJwtDecoder)
                                 .jwtAuthenticationConverter(jwtConverter())) // custom
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint()) // khi authentication nó fail ta sẽ điều hướng nó
         );
@@ -59,15 +61,6 @@ public class SecurityConfig {
         return converter;
     }
 
-
-    @Bean
-    JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
-        return NimbusJwtDecoder
-                .withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
-    }
 
     @Bean
     PasswordEncoder passwordEncoder() {

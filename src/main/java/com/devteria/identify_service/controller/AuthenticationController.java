@@ -4,6 +4,7 @@ import com.devteria.identify_service.Service.AuthenticationService;
 import com.devteria.identify_service.dto.request.ApiResponse;
 import com.devteria.identify_service.dto.request.AuthenticationRequest;
 import com.devteria.identify_service.dto.request.IntrospectRequest;
+import com.devteria.identify_service.dto.request.LogoutRequest;
 import com.devteria.identify_service.dto.response.AuthenticationResponse;
 import com.devteria.identify_service.dto.response.IntrospectResponse;
 import com.nimbusds.jose.JOSEException;
@@ -41,4 +42,12 @@ public class AuthenticationController {
                 .build();
     }
 
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request)
+            throws ParseException, JOSEException {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder()
+                .build();
+    }
 }
