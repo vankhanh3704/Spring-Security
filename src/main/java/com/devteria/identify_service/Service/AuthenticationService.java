@@ -10,6 +10,7 @@ import com.devteria.identify_service.Repository.UserRepository;
 import com.devteria.identify_service.dto.request.AuthenticationRequest;
 import com.devteria.identify_service.dto.request.IntrospectRequest;
 import com.devteria.identify_service.dto.request.LogoutRequest;
+import com.devteria.identify_service.dto.request.RefreshRequest;
 import com.devteria.identify_service.dto.response.AuthenticationResponse;
 import com.devteria.identify_service.dto.response.IntrospectResponse;
 import com.nimbusds.jose.*;
@@ -135,11 +136,11 @@ public class AuthenticationService {
     public void logout(LogoutRequest request) throws ParseException, JOSEException {
         var signToken = verifyToken(request.getToken());
 
-        String jit = signToken.getJWTClaimsSet().getJWTID();
+        String jti = signToken.getJWTClaimsSet().getJWTID();
         Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
 
         InvalidatedToken invalidatedToken = InvalidatedToken.builder()
-                .id(jit)
+                .id(jti)
                 .expiryTime(expiryTime)
                 .build();
 
@@ -164,5 +165,26 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         return  signedJWT;
+    }
+
+    public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
+        // kiem tra hieu luc cua token
+        var signedJWT = verifyToken(request.getToken());
+        var jti = signedJWT.getJWTClaimsSet().getJWTID();
+        var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .id(jti)
+                .expiryTime(expiryTime)
+                .build();
+
+        invalidatedTokenRepository.save(invalidatedToken);
+
+        var username = signedJWT.getJWTClaimsSet().getSubject();
+        var user = userRepository.findByUsername(username).orElseThrow( () -> new AppException(ErrorCode.UNAUTHENTICATED));
+        var token = generateToken(user);
+        return AuthenticationResponse.builder()
+                .token(token)
+                .authenticated(true)
+                .build();
     }
 }
