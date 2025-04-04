@@ -1,6 +1,5 @@
 package com.devteria.identify_service.dto.response;
 
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

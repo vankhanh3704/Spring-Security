@@ -1,12 +1,12 @@
 package com.devteria.identify_service.Entity;
 
-
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.time.LocalDate;
 import java.util.Set;
+
+import jakarta.persistence.*;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Entity
 @Data
@@ -20,6 +20,7 @@ public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+
     String username;
     String password;
     String firstName;
@@ -28,5 +29,4 @@ public class UserEntity {
 
     @ManyToMany
     Set<Role> roles;
-
 }

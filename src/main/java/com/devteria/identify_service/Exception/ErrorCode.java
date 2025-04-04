@@ -1,14 +1,15 @@
 package com.devteria.identify_service.Exception;
 
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+
+import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
     // loi khong xac dinh
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized Error.", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_KEY(1001,"Invalid message key.", HttpStatus.BAD_REQUEST),
+    INVALID_KEY(1001, "Invalid message key.", HttpStatus.BAD_REQUEST),
     USER_EXISTED(1002, "User already exists.", HttpStatus.BAD_REQUEST),
     USERNAME_INVALID(1003, "Username must be at least {min} characters.", HttpStatus.BAD_REQUEST),
     PASSWORD_INVALID(1004, "Password must be at least {min} characters.", HttpStatus.BAD_REQUEST),
@@ -20,11 +21,10 @@ public enum ErrorCode {
     private int code;
     private String message;
     private HttpStatusCode httpStatusCode;
+
     ErrorCode(int code, String message, HttpStatusCode httpStatusCode) {
         this.code = code;
         this.message = message;
         this.httpStatusCode = httpStatusCode;
     }
-
-
 }

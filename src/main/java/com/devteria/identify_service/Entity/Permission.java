@@ -1,11 +1,10 @@
 package com.devteria.identify_service.Entity;
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
 
 @Entity
 @Data
@@ -17,7 +16,6 @@ public class Permission {
 
     @Id
     String name;
+
     String description;
-
-
 }

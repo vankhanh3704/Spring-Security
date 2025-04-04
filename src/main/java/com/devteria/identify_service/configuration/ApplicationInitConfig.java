@@ -1,20 +1,20 @@
 package com.devteria.identify_service.configuration;
 
+import java.util.HashSet;
 
-import com.devteria.identify_service.Entity.UserEntity;
-import com.devteria.identify_service.Enum.Role;
-import com.devteria.identify_service.Repository.UserRepository;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.HashSet;
+import com.devteria.identify_service.Entity.UserEntity;
+import com.devteria.identify_service.Enum.Role;
+import com.devteria.identify_service.Repository.UserRepository;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @RequiredArgsConstructor
@@ -35,7 +35,7 @@ public class ApplicationInitConfig {
                 UserEntity user = UserEntity.builder()
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
-//                        .roles(roles)
+                        //                        .roles(roles)
                         .build();
 
                 userRepository.save(user);

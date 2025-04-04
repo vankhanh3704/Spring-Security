@@ -1,6 +1,7 @@
 package com.devteria.identify_service.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,11 +11,10 @@ import lombok.experimental.FieldDefaults;
 @Builder // giúp tạo ra 1 builder class cho 1 dto
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApiResponse <T>{
+public class ApiResponse<T> {
     @Builder.Default
     int code = 1000;
+
     String message;
     T result;
-
-
 }
